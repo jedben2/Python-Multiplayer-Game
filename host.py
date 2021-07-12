@@ -1,6 +1,8 @@
 import socket
 import threading
 from netifaces import interfaces, ifaddresses, AF_INET
+import time
+
 
 class Host:
     @staticmethod
@@ -18,18 +20,28 @@ class Host:
         self.conns = []
 
     def manage_conn(self, conn, addr):
-        print(f"Connected {conn}, {addr}")
+        print(f"Connected {addr}")
         connected = True
         while connected:
-            pass
+            data = conn.recv(1024).decode()
+            if data == "exit": connected = False
+        print("closed")
+        conn.close()
+        self.conns.remove(conn)
+        return
 
     def start(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind((self.ip, self.port))
-            s.listen()
-            conn, addr = s.accept()
-            x = threading.Thread(target=self.manage_conn)
-            x.start()
+            for _ in range(2):
+                s.listen()
+                conn, addr = s.accept()
+                x = threading.Thread(target=self.manage_conn, args=(conn, addr))
+                x.start()
+                self.conns.append(conn)
+            while len(self.conns) > 0:
+                print(self.conns)
+                time.sleep(5)
 
 
 if __name__ == '__main__':
