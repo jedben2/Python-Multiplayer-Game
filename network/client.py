@@ -20,5 +20,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         data = input(">>> ")
         if data == "exit": connected = False
         s.send(data.encode("utf-8"))
+        data_new = s.recv(1024)
+        print(data_new.decode())
 
     print("closed")

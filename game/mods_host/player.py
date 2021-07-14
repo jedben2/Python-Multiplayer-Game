@@ -1,6 +1,4 @@
 from ursina import *
-import threading
-import sys
 
 
 class Player(Entity):
@@ -19,6 +17,7 @@ class Player(Entity):
         self.collider = collider
         self.scale_x = scale_x
         self.scale_y = scale_y
+        self.always_on_top = True
 
         self.frame = 0
 
@@ -30,16 +29,21 @@ class Player(Entity):
     def attack(self, other):
         pass
 
+    def is_hit(self):
+        pass
+
     def move(self, other):
         self.dx = held_keys['d'] * 15 * self.dt - held_keys['a'] * 15 * self.dt
         if self.dx < 0:
             if self.frame > 9:
                 self.frame = 0
-            if self.frame % 3 == 0: self.texture = f"animations//char1_walk_left//{self.frame // 3}.png"
+            if self.frame % 3 == 0:
+                self.texture = f"animations//char1_walk_left//{self.frame // 3}.png"
         elif self.dx > 0:
             if self.frame > 9:
                 self.frame = 0
-            if self.frame % 3 == 0: self.texture = f"animations//char1_walk_right//{self.frame // 3}.png"
+            if self.frame % 3 == 0:
+                self.texture = f"animations//char1_walk_right//{self.frame // 3}.png"
         self.frame += 1
 
         self.dy -= self.g * self.dt

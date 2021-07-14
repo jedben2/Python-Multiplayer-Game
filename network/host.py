@@ -6,7 +6,7 @@ import time
 
 class Host:
     @staticmethod
-    def _getip():
+    def _get_ip():
         for ifaceName in interfaces():
             addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr': ''}])]
             for a in addresses:
@@ -15,7 +15,7 @@ class Host:
 
     def __init__(self, port, localhost):
         self.port = port
-        self.ip = self._getip()
+        self.ip = self._get_ip()
         if localhost: self.ip = '127.0.0.1'
         self.conns = []
 
@@ -25,6 +25,7 @@ class Host:
         while connected:
             data = conn.recv(1024).decode()
             if data == "exit": connected = False
+            elif data == "connected?": conn.send(b'yes')
         print("closed")
         conn.close()
         self.conns.remove(conn)

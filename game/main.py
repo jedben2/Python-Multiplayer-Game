@@ -1,28 +1,30 @@
-import ursina
-from player import *
+from mods_host.player_single import *
+from mods_host.arrow import *
 
 app = Ursina()
 
 window.vsync = 60
 window.title = 'Multiplayer Game'
 window.borderless = False
-window.fullscreen_size = Vec2(1920, 1080)
+window.fullscreen_size = (1920, 1080)
 window.fullscreen = True
 window.exit_button.visible = True
 window.fps_counter.enabled = True
 
-player = Player(position=(-5, 0), model="quad", texture="textures/char1_Right.png", collider='box', scale_x=1, scale_y=1)
+players = [Player(position=(-5, 0), model="quad", texture="textures/char1_right.png", collider='box', scale_x=1,
+                scale_y=1, char_num="1"), Player(position=(5, 0), model="quad", texture="textures/char2_left.png", collider='box', scale_x=1,
+                scale_y=1, char_num="2")]
+
 floor = Entity(position=(0, -1), model="quad", scale_x=30, collider='box')
-ursina.camera.position = (player.position.x, player.position.y, -40)
-
-# collision_zone = CollisionZone(parent=player, radius=1)
-
-ursina.camera.zoom = -30
-camera.add_script(SmoothFollow(target=player, offset=[0, 0, ursina.camera.zoom], speed=4))
-
+arrow = [Arrow_Body(players[0]), Arrow_Head(players[0])]
+ursina.camera.position = (players[0].position.x, players[0].position.y, -30)
+camera.add_script(SmoothFollow(target=players[0], offset=[0, 0, -30], speed=10))
 
 def update():
-    player.move(floor)
+    for player in players:
+        player.move(floor)
+    for part in arrow:
+        part.fix_position(players[0])
 
 
 app.run()
