@@ -1,5 +1,5 @@
-from mods_host.player_single import *
-from mods_host.arrow import *
+from game_mods.player_single import *
+from game_mods.arrow import *
 
 app = Ursina()
 

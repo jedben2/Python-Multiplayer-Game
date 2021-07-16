@@ -1,8 +1,8 @@
 import dataclasses
 import socket
 from ursina import *
-from game_mods.player import *
-from game_mods.arrow import *
+from client_mods.player import *
+from client_mods.arrow import *
 import sys
 
 ID = '1'
@@ -10,12 +10,19 @@ HOST = '127.0.0.1'
 PORT = 2000
 
 def update():
+    print("hello?")
     go = s.recv(1024)
-    s.send(f"{ID}/{players[0].position}/{players[0].frame}/{players[0].hp}/{players[0].dx}/{players[0].dy}/{players[0].intersects(floor).hit}/{held_keys}".encode())
-    if held_keys['w']:
-        s.send("exit".encode())
-        s.close()
-        sys.exit()
+    print("recieved, send: " + f"{players[0].intersects(floor).hit}/{held_keys}")
+    s.send(f"{players[0].intersects(floor).hit}/{held_keys}".encode())
+    print("sent")
+    for player in players:
+        player.position, player.frame, player.direction = s.recv(1024).decode().split('/')
+        player.flip()
+
+    # if held_keys['w']:
+    #     s.send("exit".encode())
+    #     s.close()
+    #     sys.exit()
 
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
