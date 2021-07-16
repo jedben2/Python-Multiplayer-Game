@@ -42,7 +42,7 @@ class Host:
         players = []
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind((self.ip, self.port))
-            for i in range(2):
+            for i in range(1):
                 s.listen()
                 conn, addr = s.accept()
                 players.append(Player(position=(-5 + 10 * i, 0), conn=conn, addr=addr))
@@ -50,15 +50,14 @@ class Host:
 
             playing = True
             while playing:
-                print("hello")
                 for player in players:
-                    print("send thing")
                     player.conn.send(" ".encode())
                     player.on_floor, player.held_keys = player.conn.recv(1024).decode().split('/')
+                    player.held_keys = dict(player.held_keys)
                     player.move()
-                    print("player done")
                 for player in players:
-                    s.sendall(f"{player.position}/{player.frame}/{player.direction}".encode())
+                    player.conn.send(f"{player.x}/{player.y}/{player.frame}/{player.direction}".encode())
+                time.sleep(1/60)
 
 if __name__ == '__main__':
     host = Host(2000, True)

@@ -21,6 +21,7 @@ class Player(Entity):
         self.addr = addr
 
     def move(self):
+        print(held_keys['d'])
         self.direction = "right"
         self.dx = held_keys['d'] * 15 * self.dt - held_keys['a'] * 15 * self.dt
         if self.dx < 0:
