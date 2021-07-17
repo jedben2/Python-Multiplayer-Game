@@ -18,7 +18,6 @@ class Player(Entity):
         self.always_on_top = True
 
         self.frame = 0
-
     def flip(self):
         if self.frame > 9:
             self.frame = 0
