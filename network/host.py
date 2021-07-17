@@ -1,4 +1,5 @@
 import socket
+import ast
 # import threading
 from netifaces import interfaces, ifaddresses, AF_INET
 import time
@@ -19,9 +20,6 @@ class Host:
         self.ip = self._get_ip()
         if localhost: self.ip = '127.0.0.1'
         self.conns = []
-
-    def handle_data(self, data):
-        datas = data.split('/')
 
     # def manage_conn(self, conn, addr):
     #     print(f"Connected {addr}")
@@ -45,20 +43,31 @@ class Host:
             for i in range(1):
                 s.listen()
                 conn, addr = s.accept()
-                players.append(Player(position=(-5 + 10 * i, 0), conn=conn, addr=addr))
-                print(addr)
+                players.append(Player(position=[-5 + 10 * i, 0], conn=conn, addr=addr))
 
             playing = True
             while playing:
                 for player in players:
-                    player.conn.send(" ".encode())
-                    player.on_floor, player.held_keys = player.conn.recv(1024).decode().split('/')
-                    player.held_keys = dict(player.held_keys)
-                    player.move()
+                    try:
+                        player.conn.send(" ".encode())
+                        vals = player.conn.recv(1024).decode().split('/')
+                        player.on_floor = ast.literal_eval(vals[0])
+                        player.held_keys['a'] = vals[1]
+                        player.held_keys['d'] = vals[2]
+                        player.held_keys['w'] = vals[3]
+                        player.frame = int(vals[4])
+                        player.move()
+                    except ValueError:
+                        print(f"Player {player.addr} not conencted")
+                        # player.conn.close()
+                        # players.remove(player)
                 for player in players:
                     player.conn.send(f"{player.x}/{player.y}/{player.frame}/{player.direction}".encode())
-                time.sleep(1/60)
+                if len(players) == 0:
+                    playing = False
+                time.sleep(1 / 60)
+
 
 if __name__ == '__main__':
-    host = Host(2000, True)
+    host = Host(2001, True)
     host.start()

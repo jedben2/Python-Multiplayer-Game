@@ -13,7 +13,7 @@ class Player(Entity):
         self.dt = 1 / 60
         self.g = 9.8
         self.on_floor = True
-        self.held_keys = []
+        self.held_keys = {'a': 0, 'd': 0, 'w': 0}
 
         self.frame = 0
 
@@ -21,19 +21,22 @@ class Player(Entity):
         self.addr = addr
 
     def move(self):
-        print(held_keys['d'])
         self.direction = "right"
-        self.dx = held_keys['d'] * 15 * self.dt - held_keys['a'] * 15 * self.dt
+        self.dx = int(self.held_keys['d']) * 15 * self.dt - int(self.held_keys['a']) * 15 * self.dt
         if self.dx < 0:
             self.direction = "left"
-        self.frame += 1
+        if self.dx != 0:
+            self.frame += 1
 
         self.dy -= self.g * self.dt
+        print(f"on_floor = {self.on_floor}")
         if self.on_floor:
             self.position[1] = 0
-            self.dy = .75 * held_keys['w']
-        if self.position[1] < -10:
-            self.position = (0, 1)
-            self.dy = 0
+            self.dy = .75 * int(self.held_keys['w'])
+            print(f"y = {self.position[1]}, dy = {self.dy}, ")
 
         self.position += (self.dx, self.dy)
+
+        if self.position[1] < 0:
+            self.position = (self.position[0], 0)
+            self.dy = 0
